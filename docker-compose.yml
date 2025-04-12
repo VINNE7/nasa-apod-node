@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    command: sh -c "npx drizzle-kit push && node dist/src/index.js"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/sqlite
+    env_file:
+      - .env
+
+  k6:
+    image: grafana/k6
+    volumes:
+      - ./k6:/scripts
+    entrypoint: ["k6", "run", "/scripts/loadtest.js"]
+    depends_on:
+      - app
