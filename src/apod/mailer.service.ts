@@ -51,7 +51,7 @@ const formatApodEmail = (data: NasaApodResponse): string => {
 const sendApodEmail = async (
   to: string,
   data: NasaApodResponse,
-): Promise<void> => {
+): Promise<boolean> => {
   const transporter = createTransporter();
   console.log("[Mailer] Sending email to", to);
   const mailOptions = {
@@ -63,6 +63,7 @@ const sendApodEmail = async (
 
   try {
     await transporter.sendMail(mailOptions);
+    return true;
   } catch (error) {
     console.error("Error sending email:", error);
     throw error;
