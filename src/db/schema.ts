@@ -1,3 +1,4 @@
+import { InferSelectModel } from "drizzle-orm";
 import {
   sqliteTable,
   text,
@@ -21,3 +22,5 @@ export const apodCache = sqliteTable("apod_cache", {
   explanation: text("explanation").notNull(),
   media_type: text("media_type").notNull(),
 });
+
+export type Job = InferSelectModel<typeof jobs>;

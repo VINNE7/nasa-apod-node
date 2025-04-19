@@ -51,9 +51,9 @@ const formatApodEmail = (data: NasaApodResponse): string => {
 const sendApodEmail = async (
   to: string,
   data: NasaApodResponse,
-): Promise<boolean> => {
+): Promise<void> => {
   const transporter = createTransporter();
-  console.log("[Mailer] Sending email to", to);
+
   const mailOptions = {
     from: process.env.SMTP_FROM || "nasa-apod@yourdomain.com",
     to,
@@ -61,13 +61,8 @@ const sendApodEmail = async (
     html: formatApodEmail(data),
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    return true;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    throw error;
-  }
+  console.log("[Mailer] Sending email to", to);
+  await transporter.sendMail(mailOptions);
 };
 
 export default { sendApodEmail };
