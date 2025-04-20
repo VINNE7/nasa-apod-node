@@ -3,3 +3,4 @@
 /dist
 package-lock.json
 data/mydb.sqlite
+sqlite/mydb.sqlite
