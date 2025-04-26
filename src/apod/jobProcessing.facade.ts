@@ -1,7 +1,7 @@
 import { Job } from "./../db/schema.js";
-import jobRepository from "../db/job.repository.js";
+import { jobRepository } from "../db/job.repository.js";
 import getApod from "./apod.service.js";
-import mailerService from "./mailer.service.js";
+import { mailerService } from "./mailer.service.js";
 import { NasaApodResponse } from "./apod.types.js";
 import { BaseException } from "../utils/exceptions/baseException.js";
 

@@ -37,7 +37,7 @@ const resetJobProcessing = async (id: number) => {
   await db.update(jobs).set({ isProcessing: false }).where(eq(jobs.id, id));
 };
 
-export default {
+export const jobRepository = {
   createJob,
   deleteJob,
   getPendingJobs,

@@ -65,4 +65,4 @@ const sendApodEmail = async (
   await transporter.sendMail(mailOptions);
 };
 
-export default { sendApodEmail };
+export const mailerService = { sendApodEmail };
