@@ -1,15 +1,13 @@
 import { Request, Response } from "express";
 import triggerJobBatch from "./jobProcessing.facade.js";
+import statusCodes from "../utils/statusCode/statusCodes.js";
+import validateBody from "../utils/zod/validateBody.js";
+import getApodSchema from "./apod.dto.js";
 
 const sendApod = async (req: Request, res: Response) => {
-  const { email } = req.body;
+  const { email } = validateBody(req).with(getApodSchema);
 
-  if (!email) {
-    res.status(400).send("Email is required");
-    return;
-  }
-
-  res.status(200).json({ message: "request accepted" });
+  res.status(statusCodes.OK).json({ message: "request accepted" });
 
   triggerJobBatch(email);
 };
