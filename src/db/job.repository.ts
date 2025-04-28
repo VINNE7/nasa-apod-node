@@ -9,7 +9,7 @@ const createJob = async (email: string) => {
 };
 
 const getPendingJobs = async (limit: number = 10) => {
-  return db
+  return await db
     .select()
     .from(jobs)
     .where(eq(jobs.isProcessing, false))
