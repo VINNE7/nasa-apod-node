@@ -4,6 +4,7 @@ import getApod from "./apod.service.js";
 import { mailerService } from "./mailer.service.js";
 import { NasaApodResponse } from "./apod.types.js";
 import { BaseException } from "../utils/exceptions/baseException.js";
+import statusCodes from "../utils/statusCode/statusCodes.js";
 
 const claimJobs = async (pendingJobs: Job[]) => {
   const results = await Promise.allSettled(
@@ -47,11 +48,13 @@ const sendEmails = async (claimedJobs: Job[], apod: NasaApodResponse) => {
 
     if (result.status === "fulfilled") {
       successfullySent.push(job);
-    } else {
-      // jobs that wasn't sent should be marked with isProcessing: false, so they can be processed by another request
-      console.warn(`[sendEmails] Failed for ${job.email}:`, result.reason);
-      resetPromises.push(jobRepository.resetJobProcessing(job.id));
+
+      continue;
     }
+
+    // jobs that wasn't sent should be marked with isProcessing: false, so they can be processed by another request
+    console.warn(`[sendEmails] Failed for ${job.email}:`, result.reason);
+    resetPromises.push(jobRepository.resetJobProcessing(job.id));
   }
   const resetResults = await Promise.allSettled(resetPromises);
 
@@ -96,18 +99,28 @@ const triggerJobBatch = (email: string) => {
       // The setImmediate doesn't run on normal HTTP lifecycle, so a middleware handler wouldn't be of much use for this
       // So, i have only one custom exception, that is Nasa API's exception, i'll log it but ideally, a table, file, or another solution
       // would be ideal so developers can check the background processing errors
-      if (error instanceof BaseException) {
-        console.error(`[${error.name}] ${error.message}`, {
-          context: error.context,
-        });
-      } else {
-        // translating unhandled exceptions to BaseException
-        const unknown = new BaseException("Unhandled error in job batch", 500, {
-          cause: error,
-          emailContext: email,
-        });
-        console.error(`[${unknown.name}] ${unknown.message}`, unknown.context);
-      }
+
+      // translating unhandled exceptions to BaseException
+      const errorCause =
+        error instanceof BaseException
+          ? {
+              name: error.name,
+              message: error.message,
+              context: error.context,
+            }
+          : new BaseException(
+              "Unhandled error in job batch",
+              statusCodes.INTERNAL_SERVER_ERROR,
+              {
+                cause: error,
+                emailContext: email,
+              },
+            );
+
+      console.error(
+        `[${errorCause.name}] ${errorCause.message}`,
+        errorCause.context,
+      );
     }
   });
 };
