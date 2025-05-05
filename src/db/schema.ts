@@ -24,3 +24,4 @@ export const apodCache = sqliteTable("apod_cache", {
 });
 
 export type Job = InferSelectModel<typeof jobs>;
+export type ApodCache = InferSelectModel<typeof apodCache>;
