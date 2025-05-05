@@ -1,18 +1,14 @@
-import nodemailer from "nodemailer";
+import nodemailer, { SentMessageInfo } from "nodemailer";
 import { NasaApodResponse } from "./apod.types.js";
 
-interface EmailConfig {
-  host: string;
-  port: number;
-  secure: boolean;
-  auth: {
-    user: string;
-    pass: string;
-  };
+export interface Mailer {
+  sendMail(
+    options: Parameters<nodemailer.Transporter["sendMail"]>[0],
+  ): Promise<SentMessageInfo>;
 }
 
-const createTransporter = () => {
-  const config: EmailConfig = {
+export const createTransporter = (): Mailer =>
+  nodemailer.createTransport({
     host: process.env.SMTP_HOST || "",
     port: Number(process.env.SMTP_PORT) || 587,
     secure: process.env.SMTP_SECURE === "true",
@@ -20,10 +16,7 @@ const createTransporter = () => {
       user: process.env.SMTP_USER || "",
       pass: process.env.SMTP_PASS || "",
     },
-  };
-
-  return nodemailer.createTransport(config);
-};
+  });
 
 const formatApodEmail = (data: NasaApodResponse): string => {
   const isImage = data.media_type === "image";
